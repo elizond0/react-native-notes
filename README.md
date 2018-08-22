@@ -12,7 +12,7 @@
 
 ### 3.1 [react-native-AlphabetListView](https://github.com/elizond0/react-native-alphabetlistview)
 
-* react-native-AlphabetListView，此控件是利用RN内置的Section和ListView组件，模仿的手机上通讯录的UI，所用版本号0.3.0，目前[原作者](https://github.com/elizond0/react-native-alphabetlistview)已经不更新，因此[fork](https://github.com/elizond0/react-native-alphabetlistview)后直接修改源码作为项目备份。
+* react-native-AlphabetListView，此控件是利用RN内置的Section和ListView组件，模仿的手机上通讯录的UI，所用版本号0.3.0，目前[原作者](https://github.com/i6mi6/react-native-alphabetlistview)已经不更新，因此fork后直接修改源码作为项目备份。
 
 * BUG-1：在右侧字母列表不是垂直撑满的情况下，手势拖拽滑动到列表外会产生红屏报错
 1. 原因：没有判断变量是否存在就,length
@@ -22,6 +22,18 @@
 1. 原因：源码计算高度有负数
 2. 解决方案：components/SelectableSectionsListView.js/#125
 
+### 3.2 [react-native-image-gallery](https://github.com/elizond0/react-native-image-gallery)
+
+* BUG-1：组件的initialPage属性设置后，组件没有更新列表状态，
+1. 原因：即没有触发DidmountHandler中的操作
+2. 解决方案：src/libraries/ViewPager/index.js/#125
+
+* BUG-2：第一次滑动后图片回到初始加载页面
+1. 原因：runAfterInteractions传入的方法，并没有在页面初始化后立即执行，而是在第一次左右滑动时才执行
+2. 解决方案：src/libraries/ViewPager/index.js/#247 临时解决方案
+
+* 性能问题-1：安卓左右滑动有厚重感，MIN_FLING_VELOCITY是速率，降低速率提高灵敏度，src/libraries/ViewPager/index.js/#247 临时解决方案
+
 ## 4. [react-navigation](https://github.com/react-navigation/react-navigation)
 
 * 由于react-navigation是react官方御用导航插件，因此提取出来单独记录
@@ -30,7 +42,7 @@
 1. 环境："react-navigation": "^2.5.5","react": "16.0.0","react-native": "0.51.0",
 2. 解决方案：在2.5.5中官方虽未在文档中列出，但react-navigation的社区中merge了相关的解决方案
 3. 后续问题-1：ios中从页面最边上水平滑动可以实现浏览器向前向后的操作，而android中则没有这个滑动事件的手势
-4. 后续问题-1的解决方案：todo待解决
+4. 后续问题-1的解决方案：主要是机型的问题，部分安卓机有左划回退的手势，todo待解决
 
 ```js
 // 首先在路由文件中引入
