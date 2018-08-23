@@ -30,9 +30,16 @@
 
 * BUG-2：第一次滑动后图片回到初始加载页面
 1. 原因：runAfterInteractions传入的方法，并没有在页面初始化后立即执行，而是在第一次左右滑动时才执行
-2. 解决方案：src/libraries/ViewPager/index.js/#247 临时解决方案
+2. 临时解决方案：src/libraries/ViewPager/index.js/#247 去除runAfterInteraction的包装
 
-* 性能问题-1：安卓左右滑动有厚重感，MIN_FLING_VELOCITY是速率，降低速率提高灵敏度，src/libraries/ViewPager/index.js/#247 临时解决方案
+* BUG-3：仅安卓出现此bug IOS正常，未开始渲染的元素通过initialPage打开时，页面只会显示已经加载的图片
+1. 原因：安卓下Gallery组件无法正确计算未渲染图片的宽度offset
+2. 解决方案：gallery组件传入getItemLayout方法，预先传入宽度，同时pageMargin属性会影响布局
+3. 后续问题-3.1：传入getItemLayout会使flatlist触发bug，无法正常渲染列表项
+4. 后续问题-3.1的解决方案：使用mobx触发组件再次渲染，进入页面时重新绘制
+
+* 性能问题-4：安卓左右滑动有厚重感
+1. 临时解决方案：MIN_FLING_VELOCITY是速率，降低速率提高灵敏度，src/libraries/ViewPager/index.js/#247
 
 ## 4. [react-navigation](https://github.com/react-navigation/react-navigation)
 
@@ -41,8 +48,8 @@
 * 需求-1：ios和android的页面切换动画保持一致，都采用水平切换的方式，默认是ios水平，安卓垂直
 1. 环境："react-navigation": "^2.5.5","react": "16.0.0","react-native": "0.51.0",
 2. 解决方案：在2.5.5中官方虽未在文档中列出，但react-navigation的社区中merge了相关的解决方案
-3. 后续问题-1：ios中从页面最边上水平滑动可以实现浏览器向前向后的操作，而android中则没有这个滑动事件的手势
-4. 后续问题-1的解决方案：主要是机型的问题，部分安卓机有左划回退的手势，todo待解决
+3. 后续问题-1.1：ios中从页面最边上水平滑动可以实现浏览器向前向后的操作，而android中则没有这个滑动事件的手势
+4. 后续问题-1.1的解决方案：主要是机型的问题，部分安卓机有左划回退的手势
 
 ```js
 // 首先在路由文件中引入
@@ -62,10 +69,10 @@ const RootNavigation = StackNavigator(
 
 ```
 
-* BUG-1：react-navigation会对路由进行层级管理并具有缓存策略，如果页面跳转时等同于goback操作，那页面不会进行重绘
+* BUG-2：react-navigation会对路由进行层级管理并具有缓存策略，如果页面跳转时等同于goback操作，那页面不会进行重绘
 1. 解决方案：官方提供了监听事件this.props.navigation.addListener('willFocus',() => {// 重新获得数据的方法体})，在willmount句柄中挂载可以对导航栏的变化进行监听
-2. 后续问题-1：在navigation进行页面切换时，如果点击速度较快，在导航动画没有完成时就进行了页面跳转，那addListener事件willFocus会挂载失败
-3. 后续问题-1的解决方案：在willmount句柄中调用两次重新取数据的方法，并且通过自定义的status避免执行两次。goback的页面中有接收参数的，也需要对接受参数并赋值的方法进行限制，避免页面闪烁，如果用到了promise的then()方法，可以设置多个status根据需要来解决
+2. 后续问题-2.1：在navigation进行页面切换时，如果点击速度较快，在导航动画没有完成时就进行了页面跳转，那addListener事件willFocus会挂载失败
+3. 后续问题-2.1的解决方案：在willmount句柄中调用两次重新取数据的方法，并且通过自定义的status避免执行两次。goback的页面中有接收参数的，也需要对接受参数并赋值的方法进行限制，避免页面闪烁，如果用到了promise的then()方法，可以设置多个status根据需要来解决
 
 ```js
 constructor(props){
@@ -91,5 +98,5 @@ getData(){
 }
 ```
 
-* BUG-2：react-navigation快速连续点击会发生多次触发切换动画
-1. 解决方案：todo待解决，可以考虑在源码中设置一定时间内限制连续点击，进行节流
+* BUG-3：react-navigation快速连续点击会发生多次触发切换动画
+1. 解决方案：todo待解决，可以考虑在源码中设置一定时间内限制连续点击
