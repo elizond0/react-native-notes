@@ -98,5 +98,7 @@ getData(){
 }
 ```
 
-* BUG-3：react-navigation快速连续点击会发生多次触发切换动画
-1. 解决方案：todo待解决，可以考虑在源码中设置一定时间内限制连续点击
+* BUG-3：react-navigation页面跳转时来回点击跳转，会导致生命周期执行bug
+1. 具体现象：例如A => B => A，正常的生命周期执行应该是A-willUnmount => B-willmount。点击间隔小于800ms时：A-willUnmount => B-willmount =>A-willunmount。
+2. 过程分析：从A跳转到B页面时，A准备开始卸载，然后B开始挂载，正确生命周期与错误bug复现过程的区别在于，A页面在B开始挂载后又执行了一次卸载操作。
+3. 临时解决方案：对页面跳转进行控制，经过测试可得800ms是安全间隔，怀疑是react-navigation的动画过程引起的。
