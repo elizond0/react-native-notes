@@ -6,6 +6,16 @@
 
 ## 1. react-native
 
+### 1.1 RN常见报错警告收集
+
+#### 1.1.1 Prevent React setState on unmounted Component
+
+* Warning: Can only update a mounted or mounting component. This usually means you called setState, replaceState, or forceUpdate on an unmounted component. This is a no-op.
+
+* Warning: Can’t call setState (or forceUpdate) on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+
+todo https://www.robinwieruch.de/react-warning-cant-call-setstate-on-an-unmounted-component/
+
 ## 2. Android Studio
 
 ## 3. RN社区组件
