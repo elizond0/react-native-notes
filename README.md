@@ -119,4 +119,4 @@ getData(){
 
 1. 具体现象：例如 A => B => A，正常的生命周期执行应该是 A-willUnmount => B-willmount。点击间隔小于 800ms 时：A-willUnmount => B-willmount =>A-willunmount。
 2. 过程分析：从 A 跳转到 B 页面时，A 准备开始卸载，然后 B 开始挂载，正确生命周期与错误 bug 复现过程的区别在于，A 页面在 B 开始挂载后又执行了一次卸载操作。
-3. 临时解决方案：对页面跳转进行控制，经过测试可得 800ms 是安全间隔，怀疑是 react-navigation 的动画过程引起的。
+3. 解决方案：通过 RN 提供的 InteractionManager 组件下，方法传入 InteractionManager.runAfterInteractions()，使用 didmount 替换 willMount，willMount 已被新版本废弃。
